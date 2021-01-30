@@ -7,15 +7,18 @@
 #include <iostream>
 
 static void show_image(const std::string &image_file) {
-    cv::Mat image;
+    cv::Mat image, hist;
 
     try {
         image = cv::imread(image_file, 1);
+        hist = make_histogram_image(image);
     } catch (cv::Exception &exception) {
         std::cout << "Error with image reading: " << exception.err << std::endl;
-        image = cv::Mat::zeros(128, 128, 0);
+        image = cv::Mat::zeros(128, 128, CV_8UC3);
+        hist = cv::Mat::zeros(400, 512, CV_8UC3);
     }
 
+    cv::imshow("Histogram", hist);
     cv::imshow("Image viewer", image);
 }
 
@@ -41,6 +44,9 @@ result_t UInterface::start() {
 
     cv::namedWindow("Image viewer", cv::WINDOW_NORMAL);
     cv::resizeWindow("Image viewer", width, height);
+
+    cv::namedWindow("Histogram", cv::WINDOW_NORMAL);
+    cv::resizeWindow("Histogram", 512, 400);
 
     if (images.size() > 1) {
         std::cout << "Open trackbar for switching between images" << std::endl;

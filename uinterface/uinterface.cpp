@@ -6,30 +6,33 @@
 
 #include <iostream>
 
-static void show_image(const std::string &image_file) {
-    cv::Mat image, hist;
+using namespace std;
+using namespace cv;
+
+static void show_image(const string &image_file) {
+    Mat image, hist;
 
     try {
-        image = cv::imread(image_file, 1);
+        image = imread(image_file, 1);
         hist = make_histogram_image(image);
-    } catch (cv::Exception &exception) {
-        std::cout << "Error with image reading: " << exception.err << std::endl;
-        image = cv::Mat::zeros(128, 128, CV_8UC3);
-        hist = cv::Mat::zeros(400, 512, CV_8UC3);
+    } catch (Exception &exception) {
+        cout << "Error with image reading: " << exception.err << endl;
+        image = Mat::zeros(128, 128, CV_8UC3);
+        hist = Mat::zeros(400, 512, CV_8UC3);
     }
 
-    cv::imshow("Histogram", hist);
-    cv::imshow("Image viewer", image);
+    imshow("Histogram", hist);
+    imshow("Image viewer", image);
 }
 
 static void on_trackbar(int pos, void *userdata) {
-    auto data = (std::vector<std::string> *) userdata;
-    std::cout << "Image: " << data->at(pos) << std::endl;
+    auto data = (vector<string> *) userdata;
+    cout << "Image: " << data->at(pos) << endl;
     show_image(data->at(pos));
 }
 
-UInterface::UInterface(const std::string &path_to_directory, int w, int h) :
-        images(std::move(list_images(path_to_directory))),
+UInterface::UInterface(const string &path_to_directory, int w, int h) :
+        images(move(list_images(path_to_directory))),
         current_index(0),
         max_index(images.size()),
         width(w),
@@ -42,19 +45,21 @@ result_t UInterface::start() {
         return NO_IMAGES;
     }
 
-    cv::namedWindow("Image viewer", cv::WINDOW_NORMAL);
-    cv::resizeWindow("Image viewer", width, height);
+    namedWindow("Image viewer", WINDOW_NORMAL);
+    resizeWindow("Image viewer", width, height);
 
-    cv::namedWindow("Histogram", cv::WINDOW_NORMAL);
-    cv::resizeWindow("Histogram", 512, 400);
+    namedWindow("Histogram", WINDOW_NORMAL);
+    resizeWindow("Histogram", 512, 400);
 
     if (images.size() > 1) {
-        std::cout << "Open trackbar for switching between images" << std::endl;
-        cv::createTrackbar("Image number", "Image viewer", &current_index, max_index - 1, on_trackbar,
+        cout << "Open trackbar for switching between images" << endl;
+        createTrackbar("Image number", "Image viewer", &current_index, max_index - 1, on_trackbar,
                            &images);
         on_trackbar(current_index, &images);
     }
-    cv::waitKey(0);
-
-    return OK;
+    for (;;) {
+        if (auto res = waitKey(0); res == 27) {
+            return OK;
+        }
+    }
 }

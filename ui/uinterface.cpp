@@ -1,14 +1,15 @@
 #include <opencv2/opencv.hpp>
-#include <algorithm>
 
 #include "uinterface.h"
 #include "image_viewer.h"
+#include "image_classifier.h"
 
 #include <iostream>
 
 using namespace std;
 using namespace cv;
 
+bool with_classifier;
 int w_width, w_height;
 const int hist_window_width = 512, hist_window_height = 400;
 const string main_window_name = "Image viewer", histogram_window_name = "Histogram";
@@ -19,6 +20,11 @@ static void show_image(const string &image_file) {
     try {
         image = imread(image_file, 1);
         hist = make_histogram_image(image);
+        if (with_classifier) {
+            int class_id = forward(image);
+            putText(image, label_lookup(class_id), Point(0, 40),
+                    FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0, 0, 0), 2);
+        }
     } catch (Exception &exception) {
         cout << "Error with image reading: " << exception.err << endl;
         image = Mat::zeros(w_height, w_width, CV_8UC3);
@@ -35,7 +41,8 @@ static void on_trackbar(int pos, void *userdata) {
     show_image(data->at(pos));
 }
 
-result_t start_ui(const std::string &path_to_images, int window_width, int window_height) {
+result_t start_ui(const std::string &path_to_images, int window_width, int window_height,
+                  bool _with_classifier) {
     const vector<string> images = list_images(path_to_images);
     if (images.empty()) {
         return NO_IMAGES;
@@ -44,6 +51,7 @@ result_t start_ui(const std::string &path_to_images, int window_width, int windo
     const int max_index = images.size();
     int current_index = 0;
 
+    with_classifier = _with_classifier;
     w_width = window_width, w_height = window_height;
 
     namedWindow(main_window_name, WINDOW_NORMAL);

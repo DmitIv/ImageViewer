@@ -9,19 +9,7 @@ enum result_t {
     NO_IMAGES
 };
 
-class UInterface {
-private:
-    std::vector<std::string> images;
+result_t start_ui(const std::string &path_to_images, int window_width, int window_height);
 
-    int current_index;
-    int max_index;
-
-    const int width;
-    const int height;
-public:
-    UInterface(const std::string &path_to_directory, int w, int h);
-
-    result_t start();
-};
 
 #endif //IMAGEVIEWER_UINTERFACE_H

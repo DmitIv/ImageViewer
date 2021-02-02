@@ -9,6 +9,10 @@
 using namespace std;
 using namespace cv;
 
+int w_width, w_height;
+const int hist_window_width = 512, hist_window_height = 400;
+const string main_window_name = "Image viewer", histogram_window_name = "Histogram";
+
 static void show_image(const string &image_file) {
     Mat image, hist;
 
@@ -17,8 +21,8 @@ static void show_image(const string &image_file) {
         hist = make_histogram_image(image);
     } catch (Exception &exception) {
         cout << "Error with image reading: " << exception.err << endl;
-        image = Mat::zeros(128, 128, CV_8UC3);
-        hist = Mat::zeros(400, 512, CV_8UC3);
+        image = Mat::zeros(w_height, w_width, CV_8UC3);
+        hist = Mat::zeros(hist_window_height, hist_window_width, CV_8UC3);
     }
 
     imshow("Histogram", hist);
@@ -31,32 +35,29 @@ static void on_trackbar(int pos, void *userdata) {
     show_image(data->at(pos));
 }
 
-UInterface::UInterface(const string &path_to_directory, int w, int h) :
-        images(move(list_images(path_to_directory))),
-        current_index(0),
-        max_index(images.size()),
-        width(w),
-        height(h) {
-}
-
-
-result_t UInterface::start() {
-    if (images.size() == 0) {
+result_t start_ui(const std::string &path_to_images, int window_width, int window_height) {
+    const vector<string> images = list_images(path_to_images);
+    if (images.empty()) {
         return NO_IMAGES;
     }
 
-    namedWindow("Image viewer", WINDOW_NORMAL);
-    resizeWindow("Image viewer", width, height);
+    const int max_index = images.size();
+    int current_index = 0;
 
-    namedWindow("Histogram", WINDOW_NORMAL);
-    resizeWindow("Histogram", 512, 400);
+    w_width = window_width, w_height = window_height;
 
-    if (images.size() > 1) {
-        cout << "Open trackbar for switching between images" << endl;
-        createTrackbar("Image number", "Image viewer", &current_index, max_index - 1, on_trackbar,
-                           &images);
-        on_trackbar(current_index, &images);
+    namedWindow(main_window_name, WINDOW_NORMAL);
+    resizeWindow(main_window_name, w_width, w_height);
+
+    namedWindow(histogram_window_name, WINDOW_NORMAL);
+    resizeWindow(histogram_window_name, hist_window_width, hist_window_height);
+
+    if (max_index > 1) {
+        createTrackbar("Image number", main_window_name, &current_index, max_index - 1, on_trackbar,
+                       (void *) &images);
+        on_trackbar(current_index, (void *) &images);
     }
+
     for (;;) {
         if (auto res = waitKey(0); res == 27) {
             return OK;

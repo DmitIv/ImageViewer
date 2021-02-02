@@ -1,36 +1,37 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-
-#include <filesystem>
-
 #include "uinterface.h"
 
+using namespace std;
+using namespace cv;
 
-std::string keys =
-        "{ help  h     | | Print help message. }"
-        "{@path        | | Path to directory with images. }";
+string keys =
+        "{ help h      | | Print help message. }"
+        "{@path        | | Path to directory with images. }"
+        "{ width wt    | 600 | Width of main window. }"
+        "{ height ht   | 800 | Height of main window }";
 
 int main(int argc, char **argv) {
-    cv::CommandLineParser parser(argc, argv, keys);
-    parser = cv::CommandLineParser(argc, argv, keys);
+    CommandLineParser parser(argc, argv, keys);
+    parser = CommandLineParser(argc, argv, keys);
 
-    parser.about("Viewing of images from directory.");
+    parser.about("Viewing of images from directory. Esc for exit.");
 
     if (argc == 1 || parser.has("help")) {
         parser.printMessage();
         return 0;
     }
 
-    int window_width = 600;
-    int window_height = 800;
+    int window_width = parser.get<int>("width");
+    int window_height = parser.get<int>("height");
 
-    switch (UInterface(parser.get<std::string>(0), window_width, window_height).start()) {
+    switch (start_ui(parser.get<string>(0), window_width, window_height)) {
         case NO_IMAGES:
-            std::cout << "target directory doesn't have images" << std::endl;
-            return -2;
+            cout << "Target directory doesn't have images" << endl;
+            return 0;
         case OK:
-            std::cout << "exit" << std::endl;
+            cout << "Exit" << endl;
             return 0;
     }
 }

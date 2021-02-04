@@ -9,12 +9,13 @@
 using namespace std;
 using namespace cv;
 
-bool with_classifier;
-int w_width, w_height;
-const int hist_window_width = 512, hist_window_height = 400;
-const string main_window_name = "Image viewer", histogram_window_name = "Histogram";
+static bool with_classifier;
+static int w_width, w_height;
+static const int hist_window_width = 512, hist_window_height = 400;
+static const string main_window_name = "Image viewer", histogram_window_name = "Histogram";
 
-Mat hist_image;
+static Mat hist_image;
+static vector<string> images;
 
 static void clear_histogram() {
     /*
@@ -68,7 +69,7 @@ result_t start_ui(const std::string &path_to_images, int window_width, int windo
      * Perform initial action for image viewer part and start GUI.
      * Wait for ESC pressing for exit.
      */
-    const vector<string> images = list_images(path_to_images);
+    images = list_images(path_to_images);
     if (images.empty()) {
         return NO_IMAGES;
     }
@@ -90,8 +91,8 @@ result_t start_ui(const std::string &path_to_images, int window_width, int windo
     if (max_index > 1) {
         createTrackbar("Image number", main_window_name, &current_index, max_index - 1, on_trackbar,
                        (void *) &images);
-        on_trackbar(current_index, (void *) &images);
     }
+    on_trackbar(current_index, (void *) &images);
 
     for (;;) {
         if (auto res = waitKey(0); res == 27) {

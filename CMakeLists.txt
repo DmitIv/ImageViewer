@@ -3,7 +3,7 @@ set(PROJECT ImageViewer)
 project(${PROJECT} C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-add_definitions(-Wall -Wextra -pedantic -O2)
+add_definitions(-Wall -Wextra -pedantic -O3)
 
 find_package(OpenCV REQUIRED) # should have processing the case if opencv not founded
 include_directories(${OpenCV_INCLUDE_DIRS} viewer classifier ui)

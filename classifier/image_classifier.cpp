@@ -6,13 +6,14 @@
 using namespace cv;
 using namespace std;
 
-dnn::Net net;
-int im_width, im_height;
-cv::Scalar im_mean;
-float im_scale;
-bool swapRB;
+static dnn::Net net;
+static cv::Scalar im_mean;
 
-vector<string> classes_labels;
+static int im_width, im_height;
+static float im_scale;
+static bool swapRB;
+
+static vector<string> classes_labels;
 
 static void read_classes_labels(const string &classes) {
     /*
@@ -26,6 +27,7 @@ static void read_classes_labels(const string &classes) {
         for (string line; getline(ifs, line); classes_labels.push_back(line)) {}
     }
 }
+
 
 void init_net(const std::string &model, const std::string &config, const std::string &framework,
               const std::string &classes, int backend, int target) {

@@ -25,8 +25,13 @@ vector<string> list_images(const string &path_to_directory) {
      * Get path_to_directory as string and return vector of paths to images from target directories
      */
     vector<string> result{};
-    glob(path_to_directory, result);
-    result.erase(remove_if(result.begin(), result.end(), is_not_image_file), result.end());
+    try {
+        glob(path_to_directory, result);
+        result.erase(remove_if(result.begin(), result.end(), is_not_image_file), result.end());
+    }
+    catch (Exception &exception) {
+        cout << "Target directory not found" << endl;
+    }
     return result;
 }
 

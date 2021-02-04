@@ -11,6 +11,9 @@ static const unordered_set<string_view> available_extensions{
 };
 
 static bool is_not_image_file(const string &filename) {
+    /*
+     * Predicate for removing files without targets extensions
+     */
     if (int ind = filename.rfind('.'); ind > 0) {
         return available_extensions.find(string_view{filename.data() + ind}) == available_extensions.end();
     }
@@ -18,6 +21,9 @@ static bool is_not_image_file(const string &filename) {
 }
 
 vector<string> list_images(const string &path_to_directory) {
+    /*
+     * Get path_to_directory as string and return vector of paths to images from target directories
+     */
     vector<string> result{};
     glob(path_to_directory, result);
     result.erase(remove_if(result.begin(), result.end(), is_not_image_file), result.end());
@@ -25,6 +31,9 @@ vector<string> list_images(const string &path_to_directory) {
 }
 
 void make_histogram_image(const Mat &image, Mat &hist_image) {
+    /*
+     * Calculate histogram for image and draw it on hist_image
+     */
     int hist_size = 256;
     float range[] = {0.0, 256.0};
     const float *hist_range = {range};

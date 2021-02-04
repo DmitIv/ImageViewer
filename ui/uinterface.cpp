@@ -17,6 +17,9 @@ const string main_window_name = "Image viewer", histogram_window_name = "Histogr
 Mat hist_image;
 
 static void clear_histogram() {
+    /*
+     * Prepare histogram image for new iteration of drawing.
+     */
     for (int i = 0; i < hist_image.rows; i++) {
         int *hist_image_i = hist_image.ptr<int>(i);
         for (int j = 0; j < hist_image.cols; j++) {
@@ -26,6 +29,10 @@ static void clear_histogram() {
 }
 
 static void show_image(const string &image_file) {
+    /*
+     * Show image and histogram for it.
+     * If ImageViewer was started with image classifier, perform classification for image.
+     */
     Mat image;
 
     clear_histogram();
@@ -38,7 +45,7 @@ static void show_image(const string &image_file) {
                     FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0, 0, 0), 2);
         }
     } catch (Exception &exception) {
-        cout << "Error with image reading: " << exception.err << endl;
+        cout << "Error on image reading: " << exception.err << endl;
         image = Mat::zeros(w_height, w_width, CV_8UC3);
     }
 
@@ -47,6 +54,9 @@ static void show_image(const string &image_file) {
 }
 
 static void on_trackbar(int pos, void *userdata) {
+    /*
+     * Get path to image by using position of trackbar and show it
+     */
     auto data = (vector<string> *) userdata;
     cout << "Image: " << data->at(pos) << endl;
     show_image(data->at(pos));
@@ -54,6 +64,10 @@ static void on_trackbar(int pos, void *userdata) {
 
 result_t start_ui(const std::string &path_to_images, int window_width, int window_height,
                   bool _with_classifier) {
+    /*
+     * Perform initial action for image viewer part and start GUI.
+     * Wait for ESC pressing for exit.
+     */
     const vector<string> images = list_images(path_to_images);
     if (images.empty()) {
         return NO_IMAGES;

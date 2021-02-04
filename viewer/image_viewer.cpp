@@ -24,7 +24,7 @@ vector<string> list_images(const string &path_to_directory) {
     return result;
 }
 
-Mat make_histogram_image(const Mat &image) {
+void make_histogram_image(const Mat &image, Mat &hist_image) {
     int hist_size = 256;
     float range[] = {0.0, 256.0};
     const float *hist_range = {range};
@@ -37,10 +37,8 @@ Mat make_histogram_image(const Mat &image) {
     calcHist(&bgr_image[1], 1, 0, Mat(), g_hist, 1, &hist_size, &hist_range, true, false);
     calcHist(&bgr_image[2], 1, 0, Mat(), r_hist, 1, &hist_size, &hist_range, true, false);
 
-    int hist_w = 512, hist_h = 400;
+    int hist_w = hist_image.cols, hist_h = hist_image.rows;
     int bin_w = cvRound((double) hist_w / hist_size);
-
-    Mat hist_image(hist_h, hist_w, CV_8UC3, Scalar(0, 0, 0));
 
     normalize(b_hist, b_hist, 0, hist_image.rows, NORM_MINMAX, -1, Mat());
     normalize(g_hist, g_hist, 0, hist_image.rows, NORM_MINMAX, -1, Mat());
@@ -57,6 +55,4 @@ Mat make_histogram_image(const Mat &image) {
              Point(bin_w * (i), hist_h - cvRound(r_hist.at<float>(i))),
              Scalar(0, 0, 255), 2, 8, 0);
     }
-
-    return hist_image;
 }

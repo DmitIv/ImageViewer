@@ -14,12 +14,24 @@ int w_width, w_height;
 const int hist_window_width = 512, hist_window_height = 400;
 const string main_window_name = "Image viewer", histogram_window_name = "Histogram";
 
-static void show_image(const string &image_file) {
-    Mat image, hist;
+Mat hist_image;
 
+static void clear_histogram() {
+    for (int i = 0; i < hist_image.rows; i++) {
+        int *hist_image_i = hist_image.ptr<int>(i);
+        for (int j = 0; j < hist_image.cols; j++) {
+            hist_image_i[j] = 0;
+        }
+    }
+}
+
+static void show_image(const string &image_file) {
+    Mat image;
+
+    clear_histogram();
     try {
         image = imread(image_file, 1);
-        hist = make_histogram_image(image);
+        make_histogram_image(image, hist_image);
         if (with_classifier) {
             int class_id = forward(image);
             putText(image, label_lookup(class_id), Point(0, 40),
@@ -28,10 +40,9 @@ static void show_image(const string &image_file) {
     } catch (Exception &exception) {
         cout << "Error with image reading: " << exception.err << endl;
         image = Mat::zeros(w_height, w_width, CV_8UC3);
-        hist = Mat::zeros(hist_window_height, hist_window_width, CV_8UC3);
     }
 
-    imshow("Histogram", hist);
+    imshow("Histogram", hist_image);
     imshow("Image viewer", image);
 }
 
@@ -47,6 +58,8 @@ result_t start_ui(const std::string &path_to_images, int window_width, int windo
     if (images.empty()) {
         return NO_IMAGES;
     }
+
+    hist_image = Mat(hist_window_height, hist_window_width, CV_8UC3, Scalar(0, 0, 0));
 
     const int max_index = images.size();
     int current_index = 0;

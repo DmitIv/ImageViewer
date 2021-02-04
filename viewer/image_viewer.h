@@ -8,6 +8,6 @@
 
 std::vector<std::string> list_images(const std::string &path_to_directory);
 
-cv::Mat make_histogram_image(const cv::Mat &bgr_image);
+void make_histogram_image(const cv::Mat &bgr_image, cv::Mat &hist_image);
 
 #endif //IMAGE_VIEWER_IMAGE_VIEWER_H
